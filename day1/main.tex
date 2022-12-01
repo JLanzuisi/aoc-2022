@@ -1,0 +1,63 @@
+\documentclass{minimal}
+
+\usepackage{etoolbox}
+
+\begin{document}
+    \makeatletter
+
+    \newcounter{EndLoop}
+    \newread\inputfile
+
+    \openin\inputfile=input
+
+    \def\currelftotal{0}
+    \def\biggest{0}
+    \def\secondbiggest{0}
+    \def\thirdbiggest{0}
+
+    \@whilenum\value{EndLoop}<1\do
+    {
+        \ifeof\inputfile
+            \setcounter{EndLoop}{1}
+        \else
+            \read\inputfile to\input
+
+            \ifdefstring{\input}{\par}
+            {
+                % (\currelftotal)
+                \ifnum\currelftotal>\biggest
+                    \let\oldsb\secondbiggest
+                    \let\secondbiggest\biggest
+                    \let\thirdbiggest\oldsb
+                    \let\biggest\currelftotal
+                \else
+                    \ifnum\currelftotal>\secondbiggest
+                        \let\thirdbiggest\secondbiggest
+                        \let\secondbiggest\currelftotal
+                    \else
+                        \ifnum\currelftotal>\thirdbiggest
+                            \let\thirdbiggest\currelftotal
+                        \fi
+                    \fi
+                \fi
+                \def\currelftotal{0}
+            }
+            {
+                \edef\currelftotal
+                {%
+                    \the\numexpr%
+                    \currelftotal%
+                    +%
+                    \input%
+                    \relax%
+                }
+            }
+        \fi
+    }
+    Result part 1: \biggest\par
+    Result part 2: \the\numexpr\biggest+\secondbiggest+\thirdbiggest\relax
+
+    \closein\inputfile
+
+    \makeatother
+\end{document}

@@ -5,7 +5,6 @@
 \begin{document}
     \makeatletter
 
-    \newcounter{EndLoop}
     \newread\inputfile% declare read handle
 
     \openin\inputfile=input% open input for reading
@@ -16,46 +15,41 @@
     \def\secondbiggest{0}
     \def\thirdbiggest{0}
 
-    \@whilenum\value{EndLoop}<1\do% it's basically a while(true) loop
-    {
-        \ifeof\inputfile% if we reach the end of file
-            \setcounter{EndLoop}{1}% break out of the loop
-        \else
-            \read\inputfile to\input% read current line into \input
+    \loop\unless\ifeof\inputfile% loop until we reach eof
+        \read\inputfile to\input% read current line into \input
 
-            \ifdefstring{\input}{\par}% tell apart blank lines
-            {
-                % update top 3 elfs
-                \ifnum\elftotal>\biggest
-                    \let\oldsb\secondbiggest% save second into temp variable
-                    \let\secondbiggest\biggest
-                    \let\thirdbiggest\oldsb
-                    \let\biggest\elftotal
+        \ifdefstring{\input}{\par}% tell apart blank lines
+        {
+            % update top 3 elfs
+            \ifnum\elftotal>\biggest
+                \let\oldsb\secondbiggest% save second into temp variable
+                \let\secondbiggest\biggest
+                \let\thirdbiggest\oldsb
+                \let\biggest\elftotal
+            \else
+                \ifnum\elftotal>\secondbiggest
+                    \let\thirdbiggest\secondbiggest
+                    \let\secondbiggest\elftotal
                 \else
-                    \ifnum\elftotal>\secondbiggest
-                        \let\thirdbiggest\secondbiggest
-                        \let\secondbiggest\elftotal
-                    \else
-                        \ifnum\elftotal>\thirdbiggest
-                            \let\thirdbiggest\elftotal
-                        \fi
+                    \ifnum\elftotal>\thirdbiggest
+                        \let\thirdbiggest\elftotal
                     \fi
                 \fi
-                \def\elftotal{0}
+            \fi
+            \def\elftotal{0}
+        }
+        {
+            % update total sum for current elf
+            \edef\elftotal
+            {%
+                \the\numexpr%
+                \elftotal%
+                +%
+                \input%
+                \relax%
             }
-            {
-                % update total sum for current elf
-                \edef\elftotal
-                {%
-                    \the\numexpr%
-                    \elftotal%
-                    +%
-                    \input%
-                    \relax%
-                }
-            }
-        \fi
-    }
+        }
+    \repeat
     Result part 1: \biggest\par
     Result part 2: \the\numexpr\biggest+\secondbiggest+\thirdbiggest\relax
 

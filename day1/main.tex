@@ -6,47 +6,49 @@
     \makeatletter
 
     \newcounter{EndLoop}
-    \newread\inputfile
+    \newread\inputfile% declare read handle
 
-    \openin\inputfile=input
+    \openin\inputfile=input% open input for reading
 
-    \def\currelftotal{0}
+    \def\elftotal{0}% current elf
+    % top 3 elfs
     \def\biggest{0}
     \def\secondbiggest{0}
     \def\thirdbiggest{0}
 
-    \@whilenum\value{EndLoop}<1\do
+    \@whilenum\value{EndLoop}<1\do% it's basically a while(true) loop
     {
-        \ifeof\inputfile
-            \setcounter{EndLoop}{1}
+        \ifeof\inputfile% if we reach the end of file
+            \setcounter{EndLoop}{1}% break out of the loop
         \else
-            \read\inputfile to\input
+            \read\inputfile to\input% read current line into \input
 
-            \ifdefstring{\input}{\par}
+            \ifdefstring{\input}{\par}% tell apart blank lines
             {
-                % (\currelftotal)
-                \ifnum\currelftotal>\biggest
-                    \let\oldsb\secondbiggest
+                % update top 3 elfs
+                \ifnum\elftotal>\biggest
+                    \let\oldsb\secondbiggest% save second into temp variable
                     \let\secondbiggest\biggest
                     \let\thirdbiggest\oldsb
-                    \let\biggest\currelftotal
+                    \let\biggest\elftotal
                 \else
-                    \ifnum\currelftotal>\secondbiggest
-                        \let\thirdbiggest\secondbiggest
-                        \let\secondbiggest\currelftotal
+                    \ifnum\elftotal>\secondbiggest
+                        \let\thirdbiggest\secondbiggest% save third into temp variable
+                        \let\secondbiggest\elftotal
                     \else
-                        \ifnum\currelftotal>\thirdbiggest
-                            \let\thirdbiggest\currelftotal
+                        \ifnum\elftotal>\thirdbiggest
+                            \let\thirdbiggest\elftotal
                         \fi
                     \fi
                 \fi
-                \def\currelftotal{0}
+                \def\elftotal{0}
             }
             {
-                \edef\currelftotal
+                % update total sum for current elf
+                \edef\elftotal
                 {%
                     \the\numexpr%
-                    \currelftotal%
+                    \elftotal%
                     +%
                     \input%
                     \relax%

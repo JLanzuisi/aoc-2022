@@ -1,0 +1,161 @@
+\documentclass{minimal}
+
+\usepackage{etoolbox}
+
+\begin{document}
+    \makeatletter
+
+    \newcounter{num}
+    \def\totalpoints{0}
+    \def\totalpointsii{0}
+
+    \newcommand{\CountRoundPoints}[2]
+    {
+        \ifdefstring{#1}{A}
+        {
+            \ifdefstring{#2}{X }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+1+3\relax}
+            }
+            {}
+            \ifdefstring{#2}{Y }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+2+6\relax}
+            }
+            {}
+            \ifdefstring{#2}{Z }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+3+0\relax}
+            }
+            {}
+        }
+        {}
+        \ifdefstring{#1}{B}
+        {
+            \ifdefstring{#2}{X }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+1+0\relax}
+            }
+            {}
+            \ifdefstring{#2}{Y }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+2+3\relax}
+            }
+            {}
+            \ifdefstring{#2}{Z }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+3+6\relax}
+            }
+            {}
+        }
+        {}
+        \ifdefstring{#1}{C}
+        {
+            \ifdefstring{#2}{X }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+1+6\relax}
+            }
+            {}
+            \ifdefstring{#2}{Y }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+2+0\relax}
+            }
+            {}
+            \ifdefstring{#2}{Z }
+            {
+                \edef\totalpoints{\the\numexpr\totalpoints+3+3\relax}
+            }
+            {}
+        }
+        {}
+    }
+
+    \newcommand{\CountRoundPointsPartII}[2]
+    {
+        \ifdefstring{#1}{A}
+        {
+            \ifdefstring{#2}{X }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+3+0\relax}
+            }
+            {}
+            \ifdefstring{#2}{Y }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+1+3\relax}
+            }
+            {}
+            \ifdefstring{#2}{Z }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+2+6\relax}
+            }
+            {}
+        }
+        {}
+        \ifdefstring{#1}{B}
+        {
+            \ifdefstring{#2}{X }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+1+0\relax}
+            }
+            {}
+            \ifdefstring{#2}{Y }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+2+3\relax}
+            }
+            {}
+            \ifdefstring{#2}{Z }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+3+6\relax}
+            }
+            {}
+        }
+        {}
+        \ifdefstring{#1}{C}
+        {
+            \ifdefstring{#2}{X }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+2+0\relax}
+            }
+            {}
+            \ifdefstring{#2}{Y }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+3+3\relax}
+            }
+            {}
+            \ifdefstring{#2}{Z }
+            {
+                \edef\totalpointsii{\the\numexpr\totalpointsii+1+6\relax}
+            }
+            {}
+        }
+        {}
+    }
+
+    \newread\inputfile% declare read handle
+
+    \openin\inputfile=input% open input for reading
+
+    \loop\unless\ifeof\inputfile% loop until we reach eof
+        \read\inputfile to\input% read current line into \input
+        \setcounter{num}{0}%
+        \@for\letter:=\input\do%
+        {%
+            \stepcounter{num}%
+            \expandafter\edef\csname player\roman{num}\endcsname{\letter}%
+        }%
+        \CountRoundPoints%
+        {\playeri}%
+        {\playerii}%
+        \CountRoundPointsPartII%
+        {\playeri}%
+        {\playerii}%
+    \repeat%
+    \typeout{=====================================}
+    \typeout{Result part 1: \totalpoints}
+    \typeout{Result part 2: \totalpointsii}
+    \typeout{=====================================}
+
+    \closein\inputfile
+
+    \makeatother
+\end{document}

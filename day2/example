@@ -1,0 +1,4 @@
+% Changed spaces to commas, they're easier to detect using TeX
+A,Y
+B,X
+C,Z

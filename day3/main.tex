@@ -1,0 +1,102 @@
+\documentclass{minimal}
+
+\usepackage{etoolbox}
+
+\begin{document}
+    \makeatletter
+
+    \newcounter{strlen}
+    \newcounter{tempa}
+    \newcounter{tempb}
+    
+    \edef\totalpoints{0}
+    
+    \newcommand{\finddup}[1]
+    {
+        \setcounter{strlen}{0}
+        \@tfor\char:=#1\do%
+        {
+            \stepcounter{strlen}
+            \edef\midpoint{\the\numexpr\thestrlen/2\relax}
+            \csedef{char\roman{strlen}}{\char}
+        }
+        
+        \setcounter{tempa}{0}
+        \@whilenum\value{tempa}<\midpoint\do%
+        {
+            \stepcounter{tempa}
+            \setcounter{tempb}{\midpoint}
+            \@whilenum\value{tempb}<\value{strlen}\do%
+            {
+                \stepcounter{tempb}
+                \ifcsequal{char\roman{tempa}}{char\roman{tempb}}
+                {
+                    \xappto\found{\csname char\roman{tempa}\endcsname}
+                    \setcounter{tempb}{\the\numexpr\thestrlen+1\relax}
+                    \setcounter{tempa}{\the\numexpr\midpoint+1\relax}
+                }
+                {}
+            }
+        }
+    }
+    
+
+    \newcommand{\countpriority}[1]
+    {
+        \@tfor\char:=#1\do%
+        {
+            \expandafter\edef
+            \expandafter\charcode
+            {
+                \expandafter\the
+                \expandafter\numexpr
+                \expandafter`\char
+                \relax
+            } 
+            % uppercase
+            \ifnum\charcode>64
+                \ifnum\charcode<91
+                    \edef\totalpoints
+                    {
+                        \the\numexpr
+                        \totalpoints
+                        +
+                        (\charcode-38)
+                        \relax
+                    }
+                \fi
+            \fi
+            % lowercase
+            \ifnum\charcode>96
+                \ifnum\charcode<123
+                    \edef\totalpoints
+                    {
+                        \the\numexpr
+                        \totalpoints
+                        +
+                        (\charcode-96)
+                        \relax
+                    }
+                \fi
+            \fi
+        }
+    }
+    
+    \newread\inputfile% declare read handle
+
+    \openin\inputfile=input% open input for reading
+
+    \loop\unless\ifeof\inputfile% loop until we reach eof
+        \read\inputfile to\input% read current line into \input
+        \expandafter\finddup\expandafter{\input}
+    \repeat%
+    \expandafter\countpriority\expandafter{\found}
+    \typeout{=====================================}
+    \typeout{Result part 1: \totalpoints}
+    \typeout{Result part 2: }
+    \typeout{=====================================}
+
+    \closein\inputfile
+
+    \makeatother
+\end{document}

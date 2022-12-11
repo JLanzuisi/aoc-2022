@@ -39,6 +39,11 @@
             }
         }
     }
+
+
+    \newcommand{\finddup@partII}[1]
+    {
+    }
     
 
     \newcommand{\countpriority}[1]
@@ -87,10 +92,18 @@
     \openin\inputfile=input% open input for reading
 
     \loop\unless\ifeof\inputfile% loop until we reach eof
-        \read\inputfile to\input% read current line into \input
-        \expandafter\finddup\expandafter{\input}
+        \read\inputfile to\lineone% read current line into \input
+        \finddup{\lineone}
+        %\unless\ifeof\inputfile
+		%    \read\inputfile to\linetwo
+        %    \finddup{\linetwo}
+	    %\fi
+        %\unless\ifeof\inputfile
+		%    \read\inputfile to\linethree
+        %    \finddup{\linethree}
+	    %\fi
     \repeat%
-    \expandafter\countpriority\expandafter{\found}
+    \countpriority{\found}
     \typeout{=====================================}
     \typeout{Result part 1: \totalpoints}
     \typeout{Result part 2: }

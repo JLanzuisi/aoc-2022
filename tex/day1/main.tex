@@ -1,59 +1,40 @@
-\documentclass{minimal}
+\ExplSyntaxOn
 
-\usepackage{etoolbox}
+\ior_new:N \l_input_stream
 
-\begin{document}
-    \makeatletter
+\ior_open:NnTF \l_input_stream { input }
+{}
+{
+    \msg_fatal:nn {day1} {file not found}
+}
 
-    \newread\inputfile% declare read handle
+\int_new:N \g_total_int
+\int_new:N \l_total_int
 
-    \openin\inputfile=input% open input for reading
+\int_zero:N \g_total_int
+\int_zero:N \l_total_int
 
-    \def\elftotal{0}% current elf
-    % top 3 elfs
-    \def\biggest{0}
-    \def\secondbiggest{0}
-    \def\thirdbiggest{0}
+\cs_generate_variant:Nn \int_add:Nn {NV}
+\cs_generate_variant:Nn \iow_now:Nn {NV}
 
-    \loop\unless\ifeof\inputfile% loop until we reach eof
-        \read\inputfile to\input% read current line into \input
-
-        \ifdefstring{\input}{\par}% tell apart blank lines
+\ior_str_map_variable:NNn \l_input_stream \l_input_str
+{
+    \str_if_empty:NTF \l_input_str
+    {
+        \int_compare:nNnTF { \l_total_int } > { \g_total_int }
         {
-            % update top 3 elfs
-            \ifnum\elftotal>\biggest
-                \let\oldsb\secondbiggest% save second into temp variable
-                \let\secondbiggest\biggest
-                \let\thirdbiggest\oldsb
-                \let\biggest\elftotal
-            \else
-                \ifnum\elftotal>\secondbiggest
-                    \let\thirdbiggest\secondbiggest
-                    \let\secondbiggest\elftotal
-                \else
-                    \ifnum\elftotal>\thirdbiggest
-                        \let\thirdbiggest\elftotal
-                    \fi
-                \fi
-            \fi
-            \def\elftotal{0}
+        \int_set_eq:NN \g_total_int \l_total_int
         }
-        {
-            % update total sum for current elf
-            \edef\elftotal
-            {%
-                \the\numexpr%
-                \elftotal%
-                +%
-                \input%
-                \relax%
-            }
-        }
-    \repeat
-    Result part 1: \biggest\par
-    Result part 2: \the\numexpr\biggest+\secondbiggest+\thirdbiggest\relax
+        {}
+        \int_zero:N \l_total_int
+    }
+{
+    \int_add:NV \l_total_int { \l_input_str }
+}
+}
 
-    \closein\inputfile
+\iow_now:NV \c_term_iow { \g_total_int }
 
-    \makeatother
+\ior_close:N \l_input_stream
+
 \end{document}
